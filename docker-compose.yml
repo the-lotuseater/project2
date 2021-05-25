@@ -1,0 +1,24 @@
+version: '3'
+services: 
+    postgres:
+        image: "postgres:latest"
+        environment:
+            - POSTGRES_PASSWORD=postgres_password
+
+    redis:
+        image: "redis:latest"
+    server:
+        build:
+            context: ./server
+            dockerfile: Dockerfile.dev 
+        volumes:
+            - /app/node_modules #bookmark node_modules folder so that we don't change anything inside it.
+            - ./server:/app #map the app folder to the server folder in the root directory of the app.
+        environment: #2 ways to define env variables. 1. the way below, these are used are runtime and are specific to the machine. 2. Use the variable the way it its used but it pulls in the variable value from the system.
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - PG_USER=postgres #need to read the documentation to get the default values for the image.
+            - PG_HOST=postgres
+            - PG_DATABASE=postgres
+            - PG_PASSWORD=postgres_password
+            - PG_HOST=5432
