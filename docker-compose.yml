@@ -7,7 +7,7 @@ services:
 
     redis:
         image: "redis:latest"
-    server:
+    api:
         build:
             context: ./server
             dockerfile: Dockerfile.dev 
@@ -22,3 +22,24 @@ services:
             - PG_DATABASE=postgres
             - PG_PASSWORD=postgres_password
             - PG_HOST=5432
+    client:
+        build:
+            context: ./client
+            dockerfile: Dockerfile.dev
+        volumes:
+            - /app/node_modules
+            - ./client:/app
+    worker:
+        build: 
+            context: ./worker
+            dockerfile: Dockerfile.dev
+        volumes: 
+            - /app/node_modules
+            - ./client:app
+    router:
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile.dev
+        restart: always #because the router is a critical piece in how the entire application is up and running we need to make sure its always up.
+        ports: 
+            - '3050:80'
